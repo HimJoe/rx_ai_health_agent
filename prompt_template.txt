@@ -1,0 +1,11 @@
+User Profile:
+{profile}
+
+User Query:
+{query}
+
+Retrieved Knowledge:
+{knowledge}
+
+Task:
+Based only on the provided profile and retrieved knowledge, generate a helpful, non-diagnostic health suggestion. Cite sources and include disclaimer.
