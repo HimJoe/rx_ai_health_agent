@@ -1,6 +1,11 @@
 # Rx-AI: Retrieval-Augmented Health Agent
 
 A working prototype of the Rx-AI system described in the paper "Rx-AI: A Retrieval-Augmented Health Agent for Truly Personal Care".
+<p align="center">
+  <img src="logo.png" alt="Rx-AI Logo" width="150" />
+</p>
+
+# Rx-AI: Retrieval-Augmented Health Agent
 
 ## Features
 - **FastAPI** backend with a `/chat` endpoint
