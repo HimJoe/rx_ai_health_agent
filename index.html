@@ -2,148 +2,199 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rx-AI: Retrieval-Augmented Health Agent</title>
+  <title>Rx-AI Health Agent</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bulma CSS for layout -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; line-height: 1.6; }
-    header { background: #004d99; color: #fff; padding: 1rem 2rem; }
-    nav a { color: #fff; margin-right: 1rem; text-decoration: none; }
-    section { padding: 2rem; }
-    h1, h2 { margin-top: 0; }
-    .chat-container { border: 1px solid #ccc; border-radius: 8px; max-width: 600px; margin: 1rem auto; padding: 1rem; }
-    #messages { max-height: 300px; overflow-y: auto; margin-bottom: 1rem; }
+    html, body { height: 100%; }
+    .navbar-item img { max-height: 3rem; }
+    #chat-window { height: 60vh; overflow-y: auto; }
     .message { margin: 0.5rem 0; }
-    .message.user { text-align: right; }
-    .message.bot { text-align: left; }
-    .message .text { display: inline-block; padding: 0.5rem 1rem; border-radius: 12px; }
-    .message.user .text { background: #cce5ff; }
-    .message.bot .text { background: #e6e6e6; }
-    form { display: flex; }
-    input[type="text"] { flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
-    button { margin-left: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 4px; background: #004d99; color: #fff; cursor: pointer; }
-    button:disabled { background: #999; }
-    footer { background: #f4f4f4; text-align: center; padding: 1rem; font-size: 0.9rem; }
+    .message.user .box { background-color: #cce5ff; }
+    .message.bot .box  { background-color: #f5f5f5; }
+    .is-hidden-mobile { border-right: 1px solid #dbdbdb; }
   </style>
 </head>
 <body>
-
-  <header>
-    <h1>Rx-AI Health Agent</h1>
-    <nav>
-      <a href="#overview">Overview</a>
-      <a href="#architecture">Architecture</a>
-      <a href="#demo">Live Demo</a>
-      <a href="#code">Code</a>
-      <a href="#references">References</a>
-    </nav>
-  </header>
-
-  <section id="overview">
-    <h2>Overview</h2>
-    <p>
-      <strong>Rx-AI</strong> is a Retrieval-Augmented Health Agent that
-      integrates large language models with a curated medical knowledge
-      base and dynamic user profiles (FHIR-inspired) to deliver personalized,
-      evidence-grounded health recommendations. It implements safety
-      checks and explicit disclaimers to ensure responsible use.
-    </p>
-    <p>
-      <a href="paper.pdf" target="_blank">Download the full paper (PDF)</a>
-    </p>
-  </section>
-
-  <section id="architecture">
-    <h2>System Architecture</h2>
-    <p>The core components:</p>
-    <ul>
-      <li><strong>Health Knowledge Base</strong>: Vector store (FAISS/Pinecone)</li>
-      <li><strong>User Profile Manager</strong>: FHIR-style user data</li>
-      <li><strong>RAG Engine</strong>: Embedding, retrieval, prompt assembly</li>
-      <li><strong>Safety Module</strong>: Emergency detection, disclaimers</li>
-    </ul>
-    <img src="architecture-diagram.png" alt="RAG System Architecture" style="max-width:100%; height:auto;">
-  </section>
-
-  <section id="demo">
-    <h2>Live Demo</h2>
-    <div class="chat-container">
-      <div id="messages"></div>
-      <form id="chat-form">
-        <input type="text" id="user-input" placeholder="Type your health question..." autocomplete="off" required>
-        <button type="submit">Send</button>
-      </form>
-    </div>
-  </section>
-
-  <section id="code">
-    <h2>Code & Deployment</h2>
-    <p>
-      Explore the full source code and deployment instructions on GitHub:
-      <a href="https://github.com/your-org/rx_ai_health_agent" target="_blank">
-        github.com/your-org/rx_ai_health_agent
+  <!-- Navbar -->
+  <nav class="navbar is-light" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#">
+        <img src="logo.png" alt="Rx-AI Logo">
+        <span class="ml-2 has-text-weight-bold">Rx-AI Health Agent</span>
       </a>
-    </p>
-  </section>
+      <a role="button" class="navbar-burger" data-target="navMenu">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div id="navMenu" class="navbar-menu">
+      <div class="navbar-end">
+        <a href="#overview"  class="navbar-item">Overview</a>
+        <a href="#architecture" class="navbar-item">Architecture</a>
+        <a href="#demo"      class="navbar-item">Demo</a>
+        <a href="#code"      class="navbar-item">Code</a>
+        <a href="#references"class="navbar-item">References</a>
+      </div>
+    </div>
+  </nav>
 
-  <section id="references">
-    <h2>References</h2>
-    <ol>
-      <li>Joshi, H., & Kumari, S. (2025). Rx-AI: A Retrieval-Augmented Health Agent for Truly Personal Care.</li>
-      <li>HL7 FHIR Standard – <a href="https://www.hl7.org/fhir/" target="_blank">hl7.org/fhir</a></li>
-      <li>Mayo Clinic Guidelines (2024).</li>
-      <!-- add more as needed -->
-    </ol>
-  </section>
+  <div class="columns is-gapless is-fullheight">
+    <!-- Sidebar -->
+    <aside class="column is-3 menu is-hidden-mobile px-4 pt-4">
+      <p class="menu-label">Your Profile</p>
+      <ul class="menu-list">
+        <li><input id="input-age"        class="input"  type="number" placeholder="Age"></li>
+        <li><input id="input-conditions" class="input"  type="text"   placeholder="Conditions"></li>
+        <li><button id="save-profile"    class="button is-info is-fullwidth">Save Profile</button></li>
+      </ul>
+      <p class="menu-label">Try Examples</p>
+      <ul class="menu-list">
+        <li><a class="demo-example" data-query="I feel dizzy and my heart is racing. What should I do?">Dizziness</a></li>
+        <li><a class="demo-example" data-query="I have chest pain and shortness of breath.">Chest Pain</a></li>
+      </ul>
+    </aside>
 
-  <footer>
-    &copy; 2025 Rx-AI Project • Built with ❤️ on GitHub Pages
-  </footer>
+    <!-- Main content -->
+    <main class="column">
+      <section class="section" id="overview">
+        <h2 class="title">Overview</h2>
+        <p><strong>Rx-AI</strong> delivers personalized, evidence-grounded health advice by combining an LLM with a medical vector store and FHIR-style user profiles.</p>
+        <p><a href="paper.pdf" target="_blank" class="button is-link is-light">Download Paper (PDF)</a></p>
+      </section>
+
+      <section class="section" id="architecture">
+        <h2 class="title">Architecture</h2>
+        <ul>
+          <li>Health Knowledge Base (FAISS/Pinecone)</li>
+          <li>User Profile Manager (FHIR-inspired)</li>
+          <li>RAG Engine (query → retrieve → LLM)</li>
+          <li>Safety Module (emergency detection, disclaimers)</li>
+        </ul>
+        <figure class="image">
+          <img src="architecture-diagram.png" alt="System Architecture">
+        </figure>
+      </section>
+
+      <section class="section" id="demo">
+        <h2 class="title">Live Demo</h2>
+        <div id="chat-window" class="box"></div>
+        <div class="field has-addons">
+          <div class="control is-expanded">
+            <input id="user-input" class="input" type="text" placeholder="Type your question...">
+          </div>
+          <div class="control">
+            <button id="send-btn" class="button is-primary">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="code">
+        <h2 class="title">Code & Deployment</h2>
+        <p>Explore the full source and setup instructions on GitHub:</p>
+        <a href="https://github.com/your-org/rx_ai_health_agent" class="button is-link">GitHub Repo</a>
+      </section>
+
+      <section class="section" id="references">
+        <h2 class="title">References</h2>
+        <ol>
+          <li>Joshi &amp; Kumari (2025). Rx-AI: Retrieval-Augmented Health Agent.</li>
+          <li><a href="https://www.hl7.org/fhir/">HL7 FHIR Standard</a></li>
+          <li>Mayo Clinic Guidelines (2024).</li>
+        </ol>
+      </section>
+
+      <footer class="footer">
+        <div class="content has-text-centered">
+          &copy; 2025 Rx-AI Project • Built with <span style="color:red;">❤</span> on GitHub Pages
+        </div>
+      </footer>
+    </main>
+  </div>
 
   <script>
-    const API_URL = 'https://your-backend.example.com/chat'; // TODO: replace with your deployed FastAPI endpoint
+    // Navbar burger for mobile
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.navbar-burger').forEach(burger => {
+        burger.addEventListener('click', () => {
+          document.getElementById(burger.dataset.target)
+            .classList.toggle('is-active');
+        });
+      });
+    });
 
-    const messagesEl = document.getElementById('messages');
-    const form = document.getElementById('chat-form');
-    const userInput = document.getElementById('user-input');
+    const API_URL = 'https://your-backend.example.com/chat'; 
+    let userProfile = JSON.parse(localStorage.getItem('rxai_profile')) || { age: '', conditions: '' };
 
-    function appendMessage(text, role='bot') {
-      const msgEl = document.createElement('div');
-      msgEl.className = 'message ' + role;
-      const bubble = document.createElement('div');
-      bubble.className = 'text';
-      bubble.innerHTML = text.replace(/\\n/g, '<br>');
-      msgEl.appendChild(bubble);
-      messagesEl.appendChild(msgEl);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
+    // Load saved profile
+    document.getElementById('input-age').value = userProfile.age;
+    document.getElementById('input-conditions').value = userProfile.conditions;
 
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const query = userInput.value.trim();
-      if (!query) return;
-      appendMessage(query, 'user');
-      userInput.value = '';
-      userInput.disabled = true;
-      form.querySelector('button').disabled = true;
+    // Save profile
+    document.getElementById('save-profile').onclick = () => {
+      userProfile.age = document.getElementById('input-age').value;
+      userProfile.conditions = document.getElementById('input-conditions').value;
+      localStorage.setItem('rxai_profile', JSON.stringify(userProfile));
+      alert('Profile saved!');
+    };
+
+    // Example queries
+    document.querySelectorAll('.demo-example').forEach(el => {
+      el.onclick = () => {
+        document.getElementById('user-input').value = el.dataset.query;
+        sendMessage();
+      };
+    });
+
+    // Chat logic
+    const chatWindow = document.getElementById('chat-window');
+    const inputEl = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    async function sendMessage() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+      appendMessage(text, 'user');
+      inputEl.value = '';
+      sendBtn.disabled = true;
 
       try {
         const resp = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: 'demo', query })
+          body: JSON.stringify({ 
+            user_id: 'demo', 
+            query: text, 
+            profile: userProfile 
+          })
         });
         const data = await resp.json();
-        const text = data.response + (data.sources?.length ? `<br><em>Sources: ${data.sources.join(', ')}</em>` : '');
-        appendMessage(text, 'bot');
+        const botText = data.response + (data.sources?.length ? `<br><em>Sources: ${data.sources.join(', ')}</em>` : '');
+        appendMessage(botText, 'bot');
       } catch (err) {
-        appendMessage('⚠️ Error connecting to the backend.', 'bot');
+        appendMessage('⚠️ Error connecting to backend.', 'bot');
       }
 
-      userInput.disabled = false;
-      form.querySelector('button').disabled = false;
-      userInput.focus();
+      sendBtn.disabled = false;
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function appendMessage(text, role) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'message ' + role;
+      const box = document.createElement('div');
+      box.className = 'box';
+      box.innerHTML = text.replace(/\\n/g, '<br>');
+      wrapper.appendChild(box);
+      chatWindow.appendChild(wrapper);
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    inputEl.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
     });
   </script>
-
 </body>
 </html>
