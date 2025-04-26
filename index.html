@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rx-AI: Retrieval-Augmented Health Agent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; line-height: 1.6; }
+    header { background: #004d99; color: #fff; padding: 1rem 2rem; }
+    nav a { color: #fff; margin-right: 1rem; text-decoration: none; }
+    section { padding: 2rem; }
+    h1, h2 { margin-top: 0; }
+    .chat-container { border: 1px solid #ccc; border-radius: 8px; max-width: 600px; margin: 1rem auto; padding: 1rem; }
+    #messages { max-height: 300px; overflow-y: auto; margin-bottom: 1rem; }
+    .message { margin: 0.5rem 0; }
+    .message.user { text-align: right; }
+    .message.bot { text-align: left; }
+    .message .text { display: inline-block; padding: 0.5rem 1rem; border-radius: 12px; }
+    .message.user .text { background: #cce5ff; }
+    .message.bot .text { background: #e6e6e6; }
+    form { display: flex; }
+    input[type="text"] { flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+    button { margin-left: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 4px; background: #004d99; color: #fff; cursor: pointer; }
+    button:disabled { background: #999; }
+    footer { background: #f4f4f4; text-align: center; padding: 1rem; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Rx-AI Health Agent</h1>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#demo">Live Demo</a>
+      <a href="#code">Code</a>
+      <a href="#references">References</a>
+    </nav>
+  </header>
+
+  <section id="overview">
+    <h2>Overview</h2>
+    <p>
+      <strong>Rx-AI</strong> is a Retrieval-Augmented Health Agent that
+      integrates large language models with a curated medical knowledge
+      base and dynamic user profiles (FHIR-inspired) to deliver personalized,
+      evidence-grounded health recommendations. It implements safety
+      checks and explicit disclaimers to ensure responsible use.
+    </p>
+    <p>
+      <a href="paper.pdf" target="_blank">Download the full paper (PDF)</a>
+    </p>
+  </section>
+
+  <section id="architecture">
+    <h2>System Architecture</h2>
+    <p>The core components:</p>
+    <ul>
+      <li><strong>Health Knowledge Base</strong>: Vector store (FAISS/Pinecone)</li>
+      <li><strong>User Profile Manager</strong>: FHIR-style user data</li>
+      <li><strong>RAG Engine</strong>: Embedding, retrieval, prompt assembly</li>
+      <li><strong>Safety Module</strong>: Emergency detection, disclaimers</li>
+    </ul>
+    <img src="architecture-diagram.png" alt="RAG System Architecture" style="max-width:100%; height:auto;">
+  </section>
+
+  <section id="demo">
+    <h2>Live Demo</h2>
+    <div class="chat-container">
+      <div id="messages"></div>
+      <form id="chat-form">
+        <input type="text" id="user-input" placeholder="Type your health question..." autocomplete="off" required>
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="code">
+    <h2>Code & Deployment</h2>
+    <p>
+      Explore the full source code and deployment instructions on GitHub:
+      <a href="https://github.com/your-org/rx_ai_health_agent" target="_blank">
+        github.com/your-org/rx_ai_health_agent
+      </a>
+    </p>
+  </section>
+
+  <section id="references">
+    <h2>References</h2>
+    <ol>
+      <li>Joshi, H., & Kumari, S. (2025). Rx-AI: A Retrieval-Augmented Health Agent for Truly Personal Care.</li>
+      <li>HL7 FHIR Standard – <a href="https://www.hl7.org/fhir/" target="_blank">hl7.org/fhir</a></li>
+      <li>Mayo Clinic Guidelines (2024).</li>
+      <!-- add more as needed -->
+    </ol>
+  </section>
+
+  <footer>
+    &copy; 2025 Rx-AI Project • Built with ❤️ on GitHub Pages
+  </footer>
+
+  <script>
+    const API_URL = 'https://your-backend.example.com/chat'; // TODO: replace with your deployed FastAPI endpoint
+
+    const messagesEl = document.getElementById('messages');
+    const form = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+
+    function appendMessage(text, role='bot') {
+      const msgEl = document.createElement('div');
+      msgEl.className = 'message ' + role;
+      const bubble = document.createElement('div');
+      bubble.className = 'text';
+      bubble.innerHTML = text.replace(/\\n/g, '<br>');
+      msgEl.appendChild(bubble);
+      messagesEl.appendChild(msgEl);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const query = userInput.value.trim();
+      if (!query) return;
+      appendMessage(query, 'user');
+      userInput.value = '';
+      userInput.disabled = true;
+      form.querySelector('button').disabled = true;
+
+      try {
+        const resp = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: 'demo', query })
+        });
+        const data = await resp.json();
+        const text = data.response + (data.sources?.length ? `<br><em>Sources: ${data.sources.join(', ')}</em>` : '');
+        appendMessage(text, 'bot');
+      } catch (err) {
+        appendMessage('⚠️ Error connecting to the backend.', 'bot');
+      }
+
+      userInput.disabled = false;
+      form.querySelector('button').disabled = false;
+      userInput.focus();
+    });
+  </script>
+
+</body>
+</html>
